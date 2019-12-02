@@ -15,7 +15,7 @@
 }
 
 .MMM-SwissStationboard table {
-    width: 400px;
+    width: 480px;
 }
 
 .MMM-SwissStationboard .red {
@@ -24,4 +24,8 @@
 
 .MMM-SwissStationboard .darkgrey {
     color: #424242
+}
+
+.MMM-SwissStationboard .black {
+    color: #000000
 }

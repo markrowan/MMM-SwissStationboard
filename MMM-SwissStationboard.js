@@ -95,6 +95,8 @@ Module.register("MMM-SwissStationboard",{
 		table.className = "small";
 		var displayedConnections = 0;
 
+		var non_reachable = 0;
+
 		for (var t in this.trains) {
 			var trains = this.trains[t];
 
@@ -118,20 +120,19 @@ Module.register("MMM-SwissStationboard",{
 			table.appendChild(row);
 			
 			// Time
-			
-
 			var depCell = document.createElement("td");
 			depCell.className = "align-left departuretime";
 			depCell.innerHTML = trains.departureTimestamp;
 
-			if(trains.delay > 0){
+            if(trains.delay > 0){
 				if (diff + trains.delay < this.config.minWalkingTime ){
-					row.className = "darkgrey";
-					}
-				} else if (diff < this.config.minWalkingTime ){
-					row.className = "darkgrey";
+					non_reachable++;  // Count number of non-reachable connections to start fading only reachable ones
+    				row.className = "darkgrey";
 				}
-
+			} else if (diff < this.config.minWalkingTime ){
+				non_reachable++;  // Count number of non-reachable connections to start fading only reachable ones
+				row.className = "darkgrey";
+			}
 			row.appendChild(depCell);
 
 			// Delay
@@ -140,8 +141,8 @@ Module.register("MMM-SwissStationboard",{
                 delayCell.className = "delay red";
                 delayCell.innerHTML = "+" + trains.delay + " min";
             } else {
-                delayCell.className = "delay red";
-                delayCell.innerHTML = ""; //trains.delay;
+                delayCell.className = "black";
+                delayCell.innerHTML = "+0 min"; //trains.delay;
             }
             row.appendChild(delayCell);
 			
@@ -154,7 +155,7 @@ Module.register("MMM-SwissStationboard",{
 			}else if(trains.type.localeCompare("strain")==0 || trains.type.localeCompare("express_train")==0 || trains.type.localeCompare("train")==0){
 				trainNumberCell.innerHTML = "<i class=\"fa fa-train\"></i> " + trains.number;
 			}else{
-				trainNumberCell.innerHTML = "<i class=\"fa fa-rocket\"></i> " + trains.number;
+				trainNumberCell.innerHTML = "" + trains.number;
 			}
 			trainNumberCell.className = "align-left";
 			row.appendChild(trainNumberCell);
@@ -178,14 +179,10 @@ Module.register("MMM-SwissStationboard",{
             
             
 
-			if (this.config.fade && this.config.fadePoint < 1) {
-				if (this.config.fadePoint < 0) {
-					this.config.fadePoint = 0;
-				}
-				var startingPoint = this.trains.length * this.config.fadePoint;
-				var steps = this.trains.length - startingPoint;
-				if (t >= startingPoint) {
-					var currentStep = t - startingPoint;
+			if (this.config.fade) {
+				var steps = this.trains.length - non_reachable;
+				if (t >= non_reachable) {
+					var currentStep = t - non_reachable;
 					row.style.opacity = 1 - (1 / steps * currentStep);
 				}
 			}
